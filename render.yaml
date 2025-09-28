@@ -1,4 +1,4 @@
-# Arquivo render.yaml CORRIGIDO
+# Arquivo render.yaml CORRETO
 
 services:
   #--------------------------------#
@@ -6,7 +6,7 @@ services:
   #--------------------------------#
   - type: web
     name: backend-caralbum
-    # CORREÇÃO 1: Trocado 'runtime' por 'env'
+    # ✅ ESTA LINHA É A CORRETA
     env: java             
     rootDir: backend
     plan: free
@@ -27,6 +27,5 @@ services:
     buildCommand: yarn && yarn build
     startCommand: yarn start
     envVars:
-      # CORREÇÃO 2: Alterada a forma de obter a URL do backend
       - key: NEXT_PUBLIC_API_URL
-        value: ${{backend-caralbum.url}} # Pega a URL do serviço 'backend-caralbum'
+        value: ${{backend-caralbum.url}}
