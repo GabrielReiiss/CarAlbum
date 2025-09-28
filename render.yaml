@@ -1,0 +1,52 @@
+# Este é o arquivo de configuração "Blueprint" para o Render.
+# Ele define os serviços que compõem sua aplicação.
+
+services:
+  #--------------------------------#
+  #  Serviço para o Backend (API)  #
+  #--------------------------------#
+  - type: web
+    name: backend-caralbum # Um nome único para o seu serviço de backend
+    env: java             # Define o ambiente como Java/Spring Boot
+    rootDir: backend      # O Render irá executar os comandos a partir desta pasta
+    plan: free            # Define o plano de serviço (o plano 'free' desliga por inatividade)
+    
+    # Comando para construir a aplicação Spring Boot
+    buildCommand: ./mvnw clean install -DskipTests
+    
+    # Comando para iniciar a aplicação após o build
+    startCommand: java -jar target/carAlbum-0.0.1-SNAPSHOT.jar
+
+    # Variáveis de ambiente para o backend
+    envVars:
+      # Render define a variável 'PORT'. Spring a usará para iniciar na porta correta.
+      # Certifique-se que seu application.properties tenha a linha: server.port=${PORT}
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+
+  #----------------------------------#
+  #  Serviço para o Frontend (Site)  #
+  #----------------------------------#
+  - type: web
+    name: frontend-caralbum # Um nome único para o seu serviço de frontend
+    env: node             # Define o ambiente como Node.js/Next.js
+    rootDir: frontend     # O Render irá executar os comandos a partir desta pasta
+    plan: free            # Define o plano de serviço
+
+    # Comando para instalar as dependências e construir o site estático
+    # Se você usa NPM, troque para: npm install && npm run build
+    buildCommand: yarn && yarn build
+    
+    # Comando para iniciar o servidor do Next.js
+    # Se você usa NPM, troque para: npm run start
+    startCommand: yarn start
+    
+    # Variáveis de ambiente para o frontend
+    envVars:
+      # Injeta a URL do backend no frontend de forma automática.
+      # Sua aplicação Next.js poderá acessar essa URL através de process.env.NEXT_PUBLIC_API_URL
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: backend-caralbum # DEVE ser o mesmo nome do serviço de backend acima
+          property: url
